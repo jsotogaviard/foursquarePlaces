@@ -15,7 +15,8 @@ libraryDependencies ++= {
     "com.typesafe.akka"   %% "akka-testkit"      % akkaV    % "test",
     "org.specs2"          %% "specs2-core"       % "2.3.11" % "test",
     "org.specs2"          %% "specs2"            % "2.3.11" % "test",
-    "org.scalatest"       %  "scalatest_2.11"    % "2.2.1"  % "test",
-    "junit"               % "junit"              % "4.11"   % "test"
+    "org.scalatest"       %  "scalatest_2.10"    % "2.2.1"  % "test",
+    "junit"               %  "junit"             % "4.11"   % "test",
+    "net.liftweb"         %% "lift-json"         % "2.5.1"
   )
 }

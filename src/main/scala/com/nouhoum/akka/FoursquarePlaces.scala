@@ -3,15 +3,12 @@ package com.nouhoum.akka
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.concurrent.impl.Future
-import scala.concurrent.impl.Future
-import scala.concurrent.impl.Future
-
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.Props
 import akka.pattern.ask
 import akka.util.Timeout
+import scalaj.http._
 
 
 /**
@@ -122,21 +119,19 @@ class FoursquareAsker extends Actor {
         // we can now
         // verify the results
         // Send the verify request tasks
-        val futures = ListBuffer()
+       
+        // TODO create a list of futures
+        var nbPlaces = 0
         implicit val timeout = Timeout(5 seconds) 
         for(dividedArea <- dividedAreas){
            val verifyRequestedArea = new VerifyRequestedArea(dividedArea)
         	 val future =  context.actorOf(Props[FoursquareAsker]) ? verifyRequestedArea
-           futures += future
+           val result = Await.result(future, timeout.duration).asInstanceOf[FoursquarePlaces]
+           nbPlaces += result.places.length
         }
         
         // Wait for the completion
         // for each one of them
-        var nbPlaces = 0
-        for(future <- futures){
-           val result = Await.result(future, timeout.duration).asInstanceOf[FoursquarePlaces]
-           nbPlaces += result.places.length
-        }
         if(nbPlaces == foursquarePlaces.length){
           
           // Send the results
@@ -176,19 +171,17 @@ class FoursquareAsker extends Actor {
   def divideInFour(initialArea : RequestedArea) : List[RequestedArea] = {
     
     // Divide in four the given region
+    return null
   }
   
   def foursquareQuery(requestedArea : RequestedArea) : List[FoursquarePlace] = {
-//    https://api.foursquare.com/v2/venues/search?
-// * client_id=CLIENT_ID&
-// * client_secret=CLIENT_SECRET&
-// * v=20130815&
-// * ll=40.7,-74&
     val request = Http("https://api.foursquare.com/v2/venues/search")
-        .param("client_id", "monkeys")
-        .param("client_secret", "monkeys")
-        .param("ll", "monkeys") //40.7,-74
+        .param("client_id", "MZRD3AHT3HIYLJQQM2YX0N0Y3Y2APFKQOBRHOP0304M1XP2U")
+        .param("client_secret", "P4YUP0HGCG4JDLNYXE4TIEXDZEZTOPWIURPNIWKWGN35XQOI")
+        .param("ll", requestedArea.centerLongitude + "," + requestedArea.centerLatitude) //40.7,-74
+        .param("radius", requestedArea.radius + "") // meters
         .asString
+    println(request)
     val places = ListBuffer[FoursquarePlace]()
     return null
   }
